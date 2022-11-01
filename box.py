@@ -8,9 +8,10 @@ class Box(object):
         # Get Remaining Possible Values
         # Get Degree
 
-    def __init__(self, value, locRow, locCol, possibleValues):
+    def __init__(self, value, locRow, locCol, locBox, possibleValues):
 
         self.value = value
         self.locRow = locRow
         self.locCol = locCol
+        self.locBox = locBox
         self.possibleValues = possibleValues
