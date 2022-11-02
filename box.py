@@ -3,10 +3,15 @@ class Box(object):
     # Attributes:
         # value - holds the value of the box
         # possibleValues - array of the possible values of the box
+        # degree - number of other boxes that are constrained by current box
+            # i.e number of empty boxes in its row, col, and 3x3 box
 
     # Functions
         # Get Remaining Possible Values
         # Get Degree
+        # Get Domain
+        # Update Degree
+        # Update Domain
 
     def __init__(self, value, locRow, locCol):
 
@@ -15,7 +20,7 @@ class Box(object):
         self.locCol = locCol
         #have to do math to figure this out
         self.locBox = self.setBoxNum()
-        # self.possibleValues = possibleValues
+        # self.domain = domain # This is the possible values for this box
 
     def setBoxNum(self):
         if(self.locRow < 3 and self.locCol < 3):

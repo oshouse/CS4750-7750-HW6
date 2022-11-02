@@ -8,41 +8,9 @@ class GameBoard(object):
         # board - contains the 9 x 9 grid board
         # emptySquares - number of empty squares
         # rowDictionary - key is the row number and the value is an array of values in that row
-    # rowDictionary = {
-    #     0: [],
-    #     1: [],
-    #     2: [],
-    #     3: [],
-    #     4: [],
-    #     5: [],
-    #     6: [],
-    #     7: [],
-    #     8: []
-    # }
-    #     # colDictionary - key is the col number and the value is an array of values in that column
-    # colDictionary = {
-    #     0: [],
-    #     1: [],
-    #     2: [],
-    #     3: [],
-    #     4: [],
-    #     5: [],
-    #     6: [],
-    #     7: [],
-    #     8: []
-    # }
-    #     # boxDictionary - key is the box number and the value is an array of values in that box
-    # boxDictionary = {
-    #     0: [],
-    #     1: [],
-    #     2: [],
-    #     3: [],
-    #     4: [],
-    #     5: [],
-    #     6: [],
-    #     7: [],
-    #     8: []
-    # }
+        # colDictionary - key is the col number and the value is an array of values in that column
+        # boxDictionary - key is the box number and the value is an array of values in that box
+
 
     # Functions
         # Update Empty Squares
@@ -50,6 +18,8 @@ class GameBoard(object):
         # Get Empty Squares
         # Print Board
         # Populate Dictionaries
+        # Update Domains - update domains in row, col, and grid of newly placed box
+        # Update Degrees - update degrees in row, col, and grid of newly placed box
 
 
     def __init__(self, board):
@@ -100,7 +70,7 @@ class GameBoard(object):
         self.board = self.initBoard(board)
         # self.emptySquares = self.findEmptySquares()
     
-
+    # oldBoard is 2d array of just values
     def initBoard(self, oldBoard):
         # possibleValues = [1,2,3,4,5,6,7,8,9]
         # if user sends an invalid board, return an empty board
