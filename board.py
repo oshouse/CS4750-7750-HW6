@@ -95,6 +95,8 @@ class GameBoard(object):
             8: []
         }
 
+        self.openSpaces = 9 * 9
+
         self.board = self.initBoard(board)
         # self.emptySquares = self.findEmptySquares()
     
@@ -111,6 +113,7 @@ class GameBoard(object):
         for row in range(9):
             for col in range(9):
                 newBoard[row][col].setValue(oldBoard[row][col])
+                self.openSpaces -= 1
                 #has to add value to dictonaries if not 0
                 if(oldBoard[row][col] != 0):
                     self.rowDictionary[row].append(oldBoard[row][col])
@@ -126,7 +129,7 @@ class GameBoard(object):
 
         return newBoard
 
-    def isPossibleValue(self, box: Box, value):
+    def isLegalValue(self, box: Box, value):
         allValues = set([1,2,3,4,5,6,7,8,9])
         notPossibleValues = set(self.boxDictionary[box.locBox] + (self.rowDictionary[box.locRow]) + (self.colDictionary[box.locCol]))
         # print(notPossibleValues)
@@ -153,3 +156,40 @@ class GameBoard(object):
             for val in row:
                 values.append(val.value)          
             print(values)
+
+
+    #returns if it is legal or not to add the value
+    def add(self, placement):
+        if isLegalValue() == True: #needs to be fixed
+            self[placement.row][placement.column] = placement.value
+            return True
+        else:
+            return False
+
+    def checkConsistency(self, placement):
+        #check the value in the row/col/box is not in any of the dictionaries
+        desiredBox = getBoxNumber(placement)
+
+        if placement.value in self.rowDictionary[placement.row] or placement.value in self.colDictionary[placement.col] or placement.value in self.boxDictionary[desiredBox]:
+            return False
+        return True
+
+def getBoxNumber(placement):
+    if(placement.row < 3 and placement.col < 3):
+        return 0
+    if(placement.row < 3 and placement.col >= 3 and placement.col < 6):
+        return 1
+    if(placement.row < 3 and placement.col >= 6 and placement.col < 9):
+        return 2
+    if(placement.row >= 3 and placement.row < 6 and placement.col < 3):
+        return 3
+    if(placement.row >= 3 and placement.row < 6 and placement.col >= 3 and placement.col < 6):
+        return 4
+    if(placement.row >= 3 and placement.row < 6 and placement.col >= 6 and placement.col < 9):
+        return 5
+    if(placement.row >= 6 and placement.row < 9 and placement.col < 3):
+        return 6
+    if(placement.row >= 6 and placement.row < 9 and placement.col >= 3 and placement.col < 6):
+        return 7
+    if(placement.row >= 6 and placement.row < 9 and placement.col >= 6 and placement.col < 9):
+        return 8
