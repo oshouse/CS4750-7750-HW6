@@ -14,12 +14,15 @@ class GameBoard(object):
 
     # Functions
         # Update Empty Squares
-        # Place Box
+        # Place Box - adds a the new box into the board
         # Get Empty Squares
         # Print Board
         # Populate Dictionaries
-        # Update Domains - update domains in row, col, and grid of newly placed box
-        # Update Degrees - update degrees in row, col, and grid of newly placed box
+        # Update Domain and Degrees (Combined)
+            # Update Domains - update domains in row, col, and grid of newly placed box
+                # Done
+            # Update Degrees - update degrees in row, col, and grid of newly placed box
+                # Done
         # Remove Box - remove the box from board and updates dictionaries / domains / degrees
 
     def __init__(self, board):
@@ -101,6 +104,75 @@ class GameBoard(object):
         # Update Degrees
 
         return newBoard
+
+    # This function only applies after a new move is made
+    # Function updates the domains of the corresponding row, col, and grid to the passed box
+        # Also updates the degrees of the corresponding row, col, and grid
+    def updateDomainsAndDegrees(self, box: Box):
+        boxRow = box.locRow
+        boxCol = box.locCol
+        boxGrid = box.locGrid
+        boxVal = box.value
+        boxDegree = 0
+        failure = False
+
+        # Update Domains and Degrees for row of box
+            # Find empty boxes in the row
+            # Check if their domains contain the value of the placed box
+            # If so, remove that value from their domains
+        for i in range(0,9):
+            # Check if box is empty and box domain contains the specified value
+            if self.board[boxRow][i].value == 0 and boxVal in self.board[boxRow][i].domain:
+                self.board[boxRow][i].domain.remove(boxVal)
+                # Check if indexed box is in the same grid as main box
+                # If it is, dont incremement the boxDegree
+                # This ensures that no boxes are repeated
+                # Also updates the degree of indexed box
+                if self.board[boxRow][i].locGrid != boxGrid:
+                    self.board[boxRow][i].degree -= 1
+                    boxDegree += 1
+                # Check if the change has removed all elements of the domain
+                if len(self.board[boxRow][i].domain) == 0:
+                    failure = True
+                    break
+        
+        # Update Domains for col of box
+        # Refer to Row Example for clarity
+        if failure == False:
+            for i in range(0,9):
+                if self.board[i][boxCol].value == 0 and boxVal in self.board[i][boxCol].domain:
+                    self.board[i][boxCol].domain.remove(boxVal)
+                    if self.board[i][boxCol].locGrid != boxGrid:
+                        self.board[i][boxCol].degree -= 1
+                        boxDegree += 1
+                    if len(self.board[i][boxCol].domain) == 0:
+                        failure = True
+                        break
+
+        # Update Domains for grid of box
+        if failure == False:
+            gridRange = box.getGridRange()
+            for i in range(gridRange[0], gridRange[1]+1):
+                for j in range(gridRange[2], gridRange[3]+1):
+                    if self.board[i][j].value == 0 and boxVal in self.board[i][j].domain:
+                        self.board[i][j].domain.remove(boxVal)
+                        # Incremement box degree for every value in the grid
+                        boxDegree += 1
+                        self.board[i][j].degree -= 1
+                        if len(self.board[i][j].domain) == 0:
+                            failure = True
+                            break
+        
+        # Check if any Domain updates failed
+        if failure == True:
+            return None
+        else:
+            box.degree = boxDegree
+        
+        # Returns the box that was passed to it
+        # This could be changed to return true or false as to whether it passed or not
+        return box
+
 
     def isLegalValue(self, box: Box, value):
         allValues = set([1,2,3,4,5,6,7,8,9])

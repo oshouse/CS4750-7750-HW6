@@ -12,6 +12,10 @@ class Box(object):
         # Get Domain
         # Set Degree
         # Set Domain
+        # Get Grid Range
+
+    domain = [] # This is the possible values for this box
+    degree = 0 # This is the number of constrains that this box holds on others
 
     def __init__(self, value, locRow, locCol):
 
@@ -20,7 +24,6 @@ class Box(object):
         self.locCol = locCol
         #have to do math to figure this out
         self.locGrid = self.setBoxNum()
-        # self.domain = domain # This is the possible values for this box
 
     def setGridNum(self):
         if(self.locRow < 3 and self.locCol < 3):
@@ -45,3 +48,28 @@ class Box(object):
 
     def setValue(self, value):
         self.value = value
+
+    # Returns array containing range of its grid
+    # [rowStart, rowEnd, colStart, colEnd]
+    def getGridRange(self):
+        range = []
+        if self.locGrid == 0:
+            range = [0, 2, 0, 2]
+        elif self.locGrid == 1:
+            range = [0, 2, 3, 5]
+        elif self.locGrid == 2:
+            range = [0, 2, 6, 8]
+        elif self.locGrid == 3:
+            range = [3, 5, 0, 2]
+        elif self.locGrid == 4:
+            range = [3, 5, 3, 5]
+        elif self.locGrid == 5:
+            range = [3, 5, 6, 8]
+        elif self.locGrid == 6:
+            range = [6, 8, 0, 2]
+        elif self.locGrid == 7:
+            range = [6, 8, 3, 5]
+        elif self.locGrid == 8:
+            range = [6, 8, 6, 8]
+
+        return range
