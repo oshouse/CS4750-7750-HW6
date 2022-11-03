@@ -10,8 +10,8 @@ class Box(object):
         # Get Remaining Possible Values
         # Get Degree
         # Get Domain
-        # Update Degree
-        # Update Domain
+        # Set Degree
+        # Set Domain
 
     def __init__(self, value, locRow, locCol):
 
@@ -19,10 +19,10 @@ class Box(object):
         self.locRow = locRow
         self.locCol = locCol
         #have to do math to figure this out
-        self.locBox = self.setBoxNum()
+        self.locGrid = self.setBoxNum()
         # self.domain = domain # This is the possible values for this box
 
-    def setBoxNum(self):
+    def setGridNum(self):
         if(self.locRow < 3 and self.locCol < 3):
             return 0
         if(self.locRow < 3 and self.locCol >= 3 and self.locCol < 6):

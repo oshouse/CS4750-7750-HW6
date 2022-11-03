@@ -14,13 +14,13 @@ class GameBoard(object):
 
     # Functions
         # Update Empty Squares
-        # Place Move
+        # Place Box
         # Get Empty Squares
         # Print Board
         # Populate Dictionaries
         # Update Domains - update domains in row, col, and grid of newly placed box
         # Update Degrees - update degrees in row, col, and grid of newly placed box
-
+        # Remove Box - remove the box from board and updates dictionaries / domains / degrees
 
     def __init__(self, board):
 
@@ -96,6 +96,9 @@ class GameBoard(object):
         #     for col in range(9):
         #         if(newBoard[row][col].value == 0):
         #              self.getPossibleValues(newBoard[row][col])
+
+        # Update Domains
+        # Update Degrees
 
         return newBoard
 
