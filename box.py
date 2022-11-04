@@ -14,36 +14,38 @@ class Box(object):
         # Set Domain
         # Get Grid Range
 
-    domain = [] # This is the possible values for this box
-    degree = 0 # This is the number of constrains that this box holds on others
+    #domain = [1, 2, 3, 4, 5, 6, 7, 8, 9] # This is the possible values for this box
+    #degree = 20 # This is the number of constrains that this box holds on others
 
     def __init__(self, value, locRow, locCol):
 
         self.value = value
         self.locRow = locRow
         self.locCol = locCol
+        self.domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.degree = 0
         #have to do math to figure this out
-        self.locGrid = self.setBoxNum()
+        self.setGridNum()
 
     def setGridNum(self):
         if(self.locRow < 3 and self.locCol < 3):
-            return 0
+            self.locGrid = 0
         if(self.locRow < 3 and self.locCol >= 3 and self.locCol < 6):
-            return 1
+            self.locGrid = 1
         if(self.locRow < 3 and self.locCol >= 6 and self.locCol < 9):
-            return 2
+            self.locGrid = 2
         if(self.locRow >= 3 and self.locRow < 6 and self.locCol < 3):
-            return 3
+            self.locGrid = 3
         if(self.locRow >= 3 and self.locRow < 6 and self.locCol >= 3 and self.locCol < 6):
-            return 4
+            self.locGrid = 4
         if(self.locRow >= 3 and self.locRow < 6 and self.locCol >= 6 and self.locCol < 9):
-            return 5
+            self.locGrid = 5
         if(self.locRow >= 6 and self.locRow < 9 and self.locCol < 3):
-            return 6
+            self.locGrid = 6
         if(self.locRow >= 6 and self.locRow < 9 and self.locCol >= 3 and self.locCol < 6):
-            return 7
+            self.locGrid = 7
         if(self.locRow >= 6 and self.locRow < 9 and self.locCol >= 6 and self.locCol < 9):
-            return 8
+            self.locGrid = 8
         
 
     def setValue(self, value):

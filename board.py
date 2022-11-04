@@ -1,4 +1,4 @@
-from webbrowser import get
+from cv2 import fastNlMeansDenoising
 from box import Box
 
 
@@ -9,7 +9,7 @@ class GameBoard(object):
         # emptySquares - number of empty squares
         # rowDictionary - key is the row number and the value is an array of values in that row
         # colDictionary - key is the col number and the value is an array of values in that column
-        # boxDictionary - key is the box number and the value is an array of values in that box
+        # gridDictionary - key is the grid number and the value is an array of values in that box
 
 
     # Functions
@@ -17,7 +17,12 @@ class GameBoard(object):
         # Place Box - adds a the new box into the board
         # Get Empty Squares
         # Print Board
+            # Done
         # Populate Dictionaries
+        # Set Domain - Initialize domain for each box 
+            # Done
+        # Set Degree = Initialize degree for each box
+            # Done
         # Update Domain and Degrees (Combined)
             # Update Domains - update domains in row, col, and grid of newly placed box
                 # Done
@@ -31,8 +36,8 @@ class GameBoard(object):
         # This is not true its actualt initialized with 0s
         # self.board = [[Box('-', i, j, possibleValues) for i in range(9)] for j in range(9)]
 
-        # boxDictionary - key is the box number and the value is an array of values in that box
-        self.boxDictionary = {
+        # gridDictionary - key is the box number and the value is an array of values in that box
+        self.gridDictionary = {
             0: [],
             1: [],
             2: [],
@@ -69,45 +74,87 @@ class GameBoard(object):
         }
 
         self.openSpaces = 9 * 9
-
-        self.board = self.initBoard(board)
-        # self.emptySquares = self.findEmptySquares()
-    
-    # oldBoard is 2d array of just values
-    def initBoard(self, oldBoard):
-        # possibleValues = [1,2,3,4,5,6,7,8,9]
-        # if user sends an invalid board, return an empty board
-        # if(len(oldBoard) != 9 or len(oldBoard[0] != 9)):
-        #     return [[Box('-', i, j, self.possibleValues) for i in range(9)] for j in range(9)]
-     
-        # newBoard = [[Box('0', j, i, possibleValues) for i in range(9)] for j in range(9)]
-        newBoard = [[Box('0', j, i) for i in range(9)] for j in range(9)]
-
+        self.board = [[Box('0', 0, 0) for i in range(9)] for j in range(9)]
         for row in range(9):
             for col in range(9):
-                newBoard[row][col].setValue(oldBoard[row][col])
-                self.openSpaces -= 1
-                #has to add value to dictonaries if not 0
-                if(oldBoard[row][col] != 0):
-                    self.rowDictionary[row].append(oldBoard[row][col])
-                    self.colDictionary[col].append(oldBoard[row][col])
-                    self.boxDictionary[newBoard[row][col].locBox].append(oldBoard[row][col])
-                    # newBoard[row][col].possibleValues = [oldBoard[row][col]]
-                
-        #after all values have been set to the dictonaries go through a find possible values for each block
-        # for row in range(9):
-        #     for col in range(9):
-        #         if(newBoard[row][col].value == 0):
-        #              self.getPossibleValues(newBoard[row][col])
+                self.board[row][col].setValue(board[row][col])
+                self.board[row][col].locRow = row
+                self.board[row][col].locCol = col
+                self.board[row][col].setGridNum()
 
-        # Update Domains
-        # Update Degrees
+                if(board[row][col] != 0):
+                    self.openSpaces -= 1
+                    self.rowDictionary[row].append(board[row][col])
+                    self.colDictionary[col].append(board[row][col])
+                    self.gridDictionary[self.board[row][col].locGrid].append(board[row][col])
 
-        return newBoard
+        # Set the domains and degrees based on starting board
+        for row in range(9):
+            for col in range(9):
+                self.setDomains(row, col)
+                self.setDegrees(row, col)
+
+
+    # Sets the domain of the box at the row and col
+    def setDomains(self, row, col):
+        if self.board[row][col].value == 0:
+            # subtract values in rowDictionary from domain
+            for val in self.rowDictionary[self.board[row][col].locRow]:
+                if val in self.board[row][col].domain:
+                    self.board[row][col].domain.remove(val)
+
+            for val in self.colDictionary[self.board[row][col].locCol]:
+                if val in self.board[row][col].domain:
+                    self.board[row][col].domain.remove(val)
+
+            for val in self.gridDictionary[self.board[row][col].locGrid]:
+                if val in self.board[row][col].domain:
+                    self.board[row][col].domain.remove(val)
+        else:
+            self.board[row][col].domain.clear()
+
+    # Sets the degrees of the box at the row and col
+    # Degree in each empty box is based on if their own domain correlates with indexed box domain
+    def setDegrees(self, row, col):
+        if self.board[row][col].value == 0:
+            # Check row and col
+            for i in range(9):
+                # Reset row and col booleans
+                rowFound = False
+                colFound = False
+                # Loop through all values in domain
+                for val in self.board[row][col].domain:
+                    # If value in row is empty, value in main box domain is in indexed box domain, and specific box hasn't been found
+                    if self.board[row][i].value == 0 and val in self.board[row][i].domain and rowFound:
+                        if self.board[row][i].locGrid != self.board[row][col].locGrid:
+                            rowFound = True
+                            self.board[row][col].degree += 1
+                    # If value in col is empty, value in main box domain is in indexed box domain, and specific box hasn't been found
+                    if self.board[i][col].value == 0 and val in self.board[i][col].domain and colFound:
+                        if self.board[i][col].locGrid != self.board[row][col].locGrid:
+                            colFound = True
+                            self.board[row][col].degree += 1
+            # Check grid
+            gridRange = self.board[row][col].getGridRange()
+            for i in range(gridRange[0], gridRange[1]+1):
+                for j in range(gridRange[2], gridRange[3]+1):
+                    for val in self.board[row][col].domain:
+                        if self.board[i][j].value == 0 and val in self.board[i][j].domain:
+                            self.board[row][col].degree += 1
+                            break
+                    
+    # Print the current board
+    def printBoard(self):
+        for row in self.board:
+            values = []
+            for val in row:
+                values.append(val.value)          
+            print(values)
 
     # This function only applies after a new move is made
     # Function updates the domains of the corresponding row, col, and grid to the passed box
         # Also updates the degrees of the corresponding row, col, and grid
+        # Degree is found based on if the value of main box is in indexed box domain
     def updateDomainsAndDegrees(self, box: Box):
         boxRow = box.locRow
         boxCol = box.locCol
@@ -136,18 +183,16 @@ class GameBoard(object):
                     failure = True
                     break
         
-        # Update Domains for col of box
-        # Refer to Row Example for clarity
-        if failure == False:
-            for i in range(0,9):
-                if self.board[i][boxCol].value == 0 and boxVal in self.board[i][boxCol].domain:
-                    self.board[i][boxCol].domain.remove(boxVal)
-                    if self.board[i][boxCol].locGrid != boxGrid:
-                        self.board[i][boxCol].degree -= 1
-                        boxDegree += 1
-                    if len(self.board[i][boxCol].domain) == 0:
-                        failure = True
-                        break
+            # Update Domains for col of box
+            # Refer to Row Example for clarity
+            if self.board[i][boxCol].value == 0 and boxVal in self.board[i][boxCol].domain:
+                self.board[i][boxCol].domain.remove(boxVal)
+                if self.board[i][boxCol].locGrid != boxGrid:
+                    self.board[i][boxCol].degree -= 1
+                    boxDegree += 1
+                if len(self.board[i][boxCol].domain) == 0:
+                    failure = True
+                    break
 
         # Update Domains for grid of box
         if failure == False:
@@ -194,13 +239,6 @@ class GameBoard(object):
                 if(self.board[row][col].value == 0):
                     return self.board[row][col]
         return None
-    
-    def printBoard(self):
-        for row in self.board:
-            values = []
-            for val in row:
-                values.append(val.value)          
-            print(values)
 
 
     #returns if it is legal or not to add the value
