@@ -92,6 +92,9 @@ class GameBoard(object):
         for row in range(9):
             for col in range(9):
                 self.setDomains(row, col)
+                
+        for row in range(9):
+            for col in range(9):
                 self.setDegrees(row, col)
 
 
@@ -125,12 +128,12 @@ class GameBoard(object):
                 # Loop through all values in domain
                 for val in self.board[row][col].domain:
                     # If value in row is empty, value in main box domain is in indexed box domain, and specific box hasn't been found
-                    if self.board[row][i].value == 0 and val in self.board[row][i].domain and rowFound:
+                    if self.board[row][i].value == 0 and val in self.board[row][i].domain and not rowFound and i != col:
                         if self.board[row][i].locGrid != self.board[row][col].locGrid:
                             rowFound = True
                             self.board[row][col].degree += 1
                     # If value in col is empty, value in main box domain is in indexed box domain, and specific box hasn't been found
-                    if self.board[i][col].value == 0 and val in self.board[i][col].domain and colFound:
+                    if self.board[i][col].value == 0 and val in self.board[i][col].domain and not colFound and i != row:
                         if self.board[i][col].locGrid != self.board[row][col].locGrid:
                             colFound = True
                             self.board[row][col].degree += 1
@@ -139,7 +142,7 @@ class GameBoard(object):
             for i in range(gridRange[0], gridRange[1]+1):
                 for j in range(gridRange[2], gridRange[3]+1):
                     for val in self.board[row][col].domain:
-                        if self.board[i][j].value == 0 and val in self.board[i][j].domain:
+                        if self.board[i][j].value == 0 and val in self.board[i][j].domain and (i != row or j != col):
                             self.board[row][col].degree += 1
                             break
                     
@@ -217,6 +220,11 @@ class GameBoard(object):
         # Returns the box that was passed to it
         # This could be changed to return true or false as to whether it passed or not
         return box
+
+    
+
+
+# ------------------------------------------------------------------------------------
 
 
     def isLegalValue(self, box: Box, value):
