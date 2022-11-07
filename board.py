@@ -6,16 +6,21 @@ class GameBoard(object):
 
     # Attributes:
         # board - contains the 9 x 9 grid board
-        # emptySquares - number of empty squares
+        # openSpaces - number of open spaces
         # rowDictionary - key is the row number and the value is an array of values in that row
         # colDictionary - key is the col number and the value is an array of values in that column
         # gridDictionary - key is the grid number and the value is an array of values in that box
 
 
     # Functions
-        # Update Empty Squares
-        # Place Box - adds a the new box into the board
-        # Get Empty Squares
+        # Update Open Spaces
+        # Place Move - adds a the new box into the board - sets value in box, updates dictionaries, and updates domains and degrees
+            # Done
+        # Find Move - uses mrv, degree heuristics, and tiebreaking to find next best move
+            # Done
+        # Get Open Spaces
+        # Set Open Spaces
+            # Done
         # Print Board
             # Done
         # Populate Dictionaries
@@ -29,6 +34,10 @@ class GameBoard(object):
             # Update Degrees - update degrees in row, col, and grid of newly placed box
                 # Done
         # Remove Box - remove the box from board and updates dictionaries / domains / degrees
+        # Get Highest Degree - get boxes with highest degree value
+            # Done
+        # Get Lowest Domain - get boxes with smallest domain
+            # Done
 
     def __init__(self, board):
 
@@ -97,6 +106,8 @@ class GameBoard(object):
             for col in range(9):
                 self.setDegrees(row, col)
 
+    def setOpenSpaces(self, openSpaces):
+        self.openSpaces = openSpaces
 
     # Sets the domain of the box at the row and col
     def setDomains(self, row, col):
@@ -213,57 +224,142 @@ class GameBoard(object):
         
         # Check if any Domain updates failed
         if failure == True:
-            return None
+            # return None
+            return False
         else:
             box.degree = boxDegree
         
         # Returns the box that was passed to it
+        # Changed to return true if updates worked and false if updates did not work
         # This could be changed to return true or false as to whether it passed or not
-        return box
+        # return box
+        return True
 
+    # Returns an array of the boxes in the board that contain the highest degree
+    # Degree Heuristic
+    # Input may be altered based on if degree or mrv is found first
+    def getHighestDegree(self):
+        highDegreeBoxes = []
+        highestDegree = 0
+        for i in range(9):
+            for j in range(9):
+                if self.board[i][j].degree > highestDegree:
+                    highDegreeBoxes.clear()
+                    highestDegree = self.board[i][j].degree
+                    highDegreeBoxes.append(self.board[i][j])
+                elif self.board[i][j].degree == highestDegree:
+                    highDegreeBoxes.append(self.board[i][j])
+
+        return highDegreeBoxes
+
+    # Finds the highest degree boxes based on results of MRV search
+    def getHighestDegreeAfterMRV(self, mrvResults):
+        highestDegreeBoxes = []
+        highestDegree = 0
+        for box in mrvResults:
+            if box.degree > highestDegree:
+                highestDegreeBoxes.clear()
+                highestDegree = box.degree
+                highestDegreeBoxes.append(box)
+            elif box.degree == highestDegree:
+                highestDegreeBoxes.append(box)
+
+        return highestDegreeBoxes
+
+    # Returns an array of the boxes with the lowest domain length (smallest domain)
+    # MRV
+    # Input may be altered based on if degree or mrv is found first
+    def getLowestDomain(self):
+        lowestDomainBoxes = []
+        lowestDomainLength = 9
+        for i in range(9):
+            for j in range(9):
+                if len(self.board[i][j].domain) > 0:
+                    if len(self.board[i][j].domain) < lowestDomainLength:
+                        lowestDomainBoxes.clear()
+                        lowestDomainLength = len(self.board[i][j].domain)
+                        lowestDomainBoxes.append(self.board[i][j])
+                    elif len(self.board[i][j].domain) == lowestDomainLength:
+                        lowestDomainBoxes.append(self.board[i][j])
+
+        return lowestDomainBoxes
+                    
+    # Returns true or false whether the move was placed and forward tracking succeeded
+    # Places move in baord, updates dictionaries and open spaces
+    # Does forward tracking (updating degrees and domains)
+        # def placeMove(self, row, col, val):
+    def placeMove(self, move):
+        row = move.locRow
+        col = move.locCol
+        val = sorted(move.domain)[0]
+
+        # Update Box
+        self.board[row][col].value = val
+        self.board[row][col].domain.clear()
+        self.board[row][col].degree = 0
+
+        # Update Dictionaries
+        self.rowDictionary[row].append(val)
+        self.colDictionary[col].append(val)
+        self.gridDictionary[self.board[row][col].locGrid].append(val)
+
+        # Decrement open spaces by 1
+        self.setOpenSpaces(self.openSpaces - 1)
+
+        # Update Domain and Degrees
+        updates = self.updateDomainsAndDegrees(self.board[row][col])
+        if not updates:
+            return False
+        
+        return True
+
+    # Returns the next best move within the board
+    # Uses mrv, degree heuristics, and tiebreaking to find move
+    def findMove(self):
+        move = 0
+        # Find MRV (Lowest Domain)
+        mrv = self.getLowestDomain()
+        if len(mrv) > 1:
+            # Find Degree Heuristic (Highest Degree)
+            deg = self.getHighestDegreeAfterMRV(mrv)
+            if len(deg) > 1:
+                # Break any remaining ties
+                move = tieBreak(deg)
+            else:
+                move = deg[0]
+        else:
+            move = mrv[0]
+
+        return move
+
+
+# Breaks tie within array of boxes and returns the box
+def tieBreak(boxArray):
+    # Find the boxes with lowest col value
+    lowestCol = 8
+    lowestCols = []
+    for box in boxArray:
+        if box.locCol < lowestCol:
+            lowestCols.clear()
+            lowestCol = box.locCol
+            lowestCols.append(box)
+        elif box.col == lowestCol:
+            lowestCols.append(box)
+
+    lowestRow = 8
+    lowestRowIndex = 0
+    if len(lowestCols) > 1:
+        for i in range(lowestCols):
+            if lowestCols[i].locRow < lowestRow:
+                lowestRow = lowestCols[i].locRow
+                lowestRowIndex = i
+    else:
+        return lowestCols[0]
+
+    return lowestCols[lowestRowIndex]
     
-
-
 # ------------------------------------------------------------------------------------
 
-
-    def isLegalValue(self, box: Box, value):
-        allValues = set([1,2,3,4,5,6,7,8,9])
-        notPossibleValues = set(self.boxDictionary[box.locBox] + (self.rowDictionary[box.locRow]) + (self.colDictionary[box.locCol]))
-        # print(notPossibleValues)
-        possibleValues = (allValues - notPossibleValues).union(notPossibleValues - allValues)
-        if value in possibleValues:
-            return True
-        else:
-            return False
-
-        # box.possibleValues = list(possibleValues)
-        # box.possibleValues.sort()
-
-    #should itterate left to right to break ties according to instructions
-    def findEmptySquare(self):
-        for row in range(9):
-            for col in range(9):
-                if(self.board[row][col].value == 0):
-                    return self.board[row][col]
-        return None
-
-
-    #returns if it is legal or not to add the value
-    def add(self, placement):
-        if isLegalValue() == True: #needs to be fixed
-            self[placement.row][placement.column] = placement.value
-            return True
-        else:
-            return False
-
-    def checkConsistency(self, placement):
-        #check the value in the row/col/box is not in any of the dictionaries
-        desiredBox = getBoxNumber(placement)
-
-        if placement.value in self.rowDictionary[placement.row] or placement.value in self.colDictionary[placement.col] or placement.value in self.boxDictionary[desiredBox]:
-            return False
-        return True
 
 def getBoxNumber(placement):
     if(placement.row < 3 and placement.col < 3):

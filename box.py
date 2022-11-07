@@ -75,3 +75,8 @@ class Box(object):
             range = [6, 8, 6, 8]
 
         return range
+
+    def printBox(self):
+        print("Box Val: " + str(self.value) + " Row: " + str(self.locRow) + 
+            " Col: " + str(self.locCol) + " Grid: " + str(self.locGrid) +
+            " Deg: " + str(self.degree) + " Domain:", self.domain)
