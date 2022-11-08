@@ -28,7 +28,7 @@ class GameBoard(object):
             # Done
         # Set Degree = Initialize degree for each box
             # Done
-        # Update Domain and Degrees (Combined)
+        # Update Domain and Degrees (Combined) 
             # Update Domains - update domains in row, col, and grid of newly placed box
                 # Done
             # Update Degrees - update degrees in row, col, and grid of newly placed box
@@ -40,10 +40,6 @@ class GameBoard(object):
             # Done
 
     def __init__(self, board):
-
-        # Board is now initialized with '-' instead of 0 
-        # This is not true its actualt initialized with 0s
-        # self.board = [[Box('-', i, j, possibleValues) for i in range(9)] for j in range(9)]
 
         # gridDictionary - key is the box number and the value is an array of values in that box
         self.gridDictionary = {
@@ -165,7 +161,7 @@ class GameBoard(object):
                 values.append(val.value)          
             print(values)
 
-    # This function only applies after a new move is made
+    # This function only applies after a new move is made - Forward checking
     # Function updates the domains of the corresponding row, col, and grid to the passed box
         # Also updates the degrees of the corresponding row, col, and grid
         # Degree is found based on if the value of main box is in indexed box domain
@@ -235,6 +231,51 @@ class GameBoard(object):
         # return box
         return True
 
+    def updateDomainAndDegreeAfterDelete(self, box: Box):
+        boxRow = box.locRow
+        boxCol = box.locCol
+
+        #sets domains
+        for i in range(0,9):
+            # Check if box is empty and box domain contains the specified value
+            if self.board[boxRow][i].value == 0:
+                box.domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                self.setDomains(boxRow, i)
+                # self.setDegrees(boxRow, i)
+
+            if self.board[i][boxCol].value == 0:
+                box.domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                self.setDomains(i, boxCol)
+                # self.setDegrees(i, boxCol)
+
+            
+        gridRange = box.getGridRange()
+        for i in range(gridRange[0], gridRange[1]+1):
+            for j in range(gridRange[2], gridRange[3]+1):
+                if self.board[i][j].value == 0:
+                    box.domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                    self.setDomains(i, j)
+                    # self.setDegrees(i, boxCol)
+        self.setDomains(boxRow, boxCol) 
+
+        #sets degree
+        for i in range(0,9):
+            # Check if box is empty and box domain contains the specified value
+            if self.board[boxRow][i].value == 0:
+                self.setDegrees(boxRow, i)
+
+            if self.board[i][boxCol].value == 0:
+                self.setDegrees(i, boxCol)
+
+            
+        gridRange = box.getGridRange()
+        for i in range(gridRange[0], gridRange[1]+1):
+            for j in range(gridRange[2], gridRange[3]+1):
+                if self.board[i][j].value == 0:
+                    self.setDegrees(i, j)
+
+        self.setDegrees(boxRow, boxCol) 
+
     # Returns an array of the boxes in the board that contain the highest degree
     # Degree Heuristic
     # Input may be altered based on if degree or mrv is found first
@@ -288,10 +329,10 @@ class GameBoard(object):
     # Places move in baord, updates dictionaries and open spaces
     # Does forward tracking (updating degrees and domains)
         # def placeMove(self, row, col, val):
-    def placeMove(self, move):
+    def placeMove(self, move, val):
         row = move.locRow
         col = move.locCol
-        val = sorted(move.domain)[0]
+        # val = sorted(move.domain)[0]
 
         # Update Box
         self.board[row][col].value = val
@@ -308,6 +349,34 @@ class GameBoard(object):
 
         # Update Domain and Degrees
         updates = self.updateDomainsAndDegrees(self.board[row][col])
+        if not updates:
+            return False
+        
+        return True
+
+    # removes a move
+    # removes a move on the baord, updates dictionaries and open spaces
+        # def placeMove(self, row, col, val):
+    def removeMove(self, move: Box, val):
+        row = move.locRow
+        col = move.locCol
+        # val = sorted(move.domain)[0]
+
+        # Update Box
+        self.board[row][col].value = 0
+        self.board[row][col].domain.clear()
+        self.board[row][col].degree = 0
+
+        # Update Dictionaries
+        self.rowDictionary[row].remove(val)
+        self.colDictionary[col].remove(val)
+        self.gridDictionary[self.board[row][col].locGrid].remove(val)
+
+        # Increment open spaces by 1
+        self.setOpenSpaces(self.openSpaces + 1)
+
+        # Update Domain and Degrees
+        updates = self.updateDomainAndDegreeAfterDelete(self.board[row][col])
         if not updates:
             return False
         
@@ -343,20 +412,20 @@ def tieBreak(boxArray):
             lowestCols.clear()
             lowestCol = box.locCol
             lowestCols.append(box)
-        elif box.col == lowestCol:
+        elif box.locCol == lowestCol:
             lowestCols.append(box)
 
     lowestRow = 8
-    lowestRowIndex = 0
+    lowestBox = lowestCols[0]
     if len(lowestCols) > 1:
-        for i in range(lowestCols):
-            if lowestCols[i].locRow < lowestRow:
-                lowestRow = lowestCols[i].locRow
-                lowestRowIndex = i
+        for box in lowestCols:
+            if box.locRow < lowestRow:
+                lowestRow = box.locRow
+                lowestBox = box
     else:
         return lowestCols[0]
 
-    return lowestCols[lowestRowIndex]
+    return lowestBox
     
 # ------------------------------------------------------------------------------------
 
