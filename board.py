@@ -239,12 +239,12 @@ class GameBoard(object):
         for i in range(0,9):
             # Check if box is empty and box domain contains the specified value
             if self.board[boxRow][i].value == 0:
-                box.domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                self.board[boxRow][i].domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
                 self.setDomains(boxRow, i)
                 # self.setDegrees(boxRow, i)
 
             if self.board[i][boxCol].value == 0:
-                box.domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                self.board[i][boxCol].domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
                 self.setDomains(i, boxCol)
                 # self.setDegrees(i, boxCol)
 
@@ -253,7 +253,7 @@ class GameBoard(object):
         for i in range(gridRange[0], gridRange[1]+1):
             for j in range(gridRange[2], gridRange[3]+1):
                 if self.board[i][j].value == 0:
-                    box.domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                    self.board[i][j].domain = [1, 2, 3, 4, 5, 6, 7, 8, 9]
                     self.setDomains(i, j)
                     # self.setDegrees(i, boxCol)
         self.setDomains(boxRow, boxCol) 
@@ -376,9 +376,7 @@ class GameBoard(object):
         self.setOpenSpaces(self.openSpaces + 1)
 
         # Update Domain and Degrees
-        updates = self.updateDomainAndDegreeAfterDelete(self.board[row][col])
-        if not updates:
-            return False
+        self.updateDomainAndDegreeAfterDelete(self.board[row][col])
         
         return True
 
