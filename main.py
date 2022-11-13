@@ -2,7 +2,6 @@
 
 # Imports
 import time
-from turtle import back
 from board import GameBoard
 from box import Box
 
