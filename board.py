@@ -1,6 +1,7 @@
-from cv2 import fastNlMeansDenoising
-from box import Box
+# Board Class
 
+# Imports
+from box import Box
 
 class GameBoard(object):
 
@@ -15,29 +16,19 @@ class GameBoard(object):
     # Functions
         # Update Open Spaces
         # Place Move - adds a the new box into the board - sets value in box, updates dictionaries, and updates domains and degrees
-            # Done
         # Find Move - uses mrv, degree heuristics, and tiebreaking to find next best move
-            # Done
         # Get Open Spaces
         # Set Open Spaces
-            # Done
         # Print Board
-            # Done
         # Populate Dictionaries
         # Set Domain - Initialize domain for each box 
-            # Done
         # Set Degree = Initialize degree for each box
-            # Done
         # Update Domain and Degrees (Combined) 
             # Update Domains - update domains in row, col, and grid of newly placed box
-                # Done
             # Update Degrees - update degrees in row, col, and grid of newly placed box
-                # Done
         # Remove Box - remove the box from board and updates dictionaries / domains / degrees
         # Get Highest Degree - get boxes with highest degree value
-            # Done
         # Get Lowest Domain - get boxes with smallest domain
-            # Done
 
     def __init__(self, board):
 
@@ -225,10 +216,8 @@ class GameBoard(object):
         else:
             box.degree = boxDegree
         
-        # Returns the box that was passed to it
-        # Changed to return true if updates worked and false if updates did not work
-        # This could be changed to return true or false as to whether it passed or not
-        # return box
+
+        # Return true if updates worked and false if updates did not work
         return True
 
     def updateDomainAndDegreeAfterDelete(self, box: Box):

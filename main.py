@@ -13,21 +13,15 @@ def main():
     if run == "1":
         timer1 = time.perf_counter()
         instanceOne()
-        # instanceTwo()
-        # instanceThree()
         timer2 = time.perf_counter()
         print("Run Time:", "{:.4f}".format(timer2 - timer1), "seconds")
     elif run == "2":
         timer1 = time.perf_counter()
-        # instanceOne()
         instanceTwo()
-        # instanceThree()
         timer2 = time.perf_counter()
         print("Run Time:", "{:.4f}".format(timer2 - timer1), "seconds")
     elif run == "3":
         timer1 = time.perf_counter()
-        # instanceOne()
-        # instanceTwo()
         instanceThree()
         timer2 = time.perf_counter()
         print("Run Time:", "{:.4f}".format(timer2 - timer1), "seconds")
@@ -103,14 +97,11 @@ def backTracking(board : GameBoard):
 
     if instanceCount < 4:
                 print("\nAssignment:", str(instanceCount+1))
-                # emptyBox.printBox()
                 print("Assignment-Row: " + str(emptyBox.locRow))
                 print("Assignment-Col: " + str(emptyBox.locCol))
                 print("Domain Size:", len(possibleValues))
                 print("Degree:", emptyBox.degree)
-                # print("Value:", possibleValues)
-                # print("Value:", str(value))
-                # instanceCount += 1
+
     #evaluates values 1 through 9
     for value in possibleValues:
 
